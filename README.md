@@ -1,7 +1,7 @@
 ## Using a Keras Sequential Network to Predict All-NBA Teams
 
 
-**Background**
+<u>background</u>
 
 Being on the All-NBA Team is an annual award given to the best players in each season by the National Basketball Association. The vote consists of 100 ballots from a global panel of sportswriters and broadcasters. Since 1965, the panel has selected two guards, two forwards, and one center for each of the three teams (All-NBA Team, n.d.). Although the “success” of a player is assumed to be determined on their unbiased game time statistics, because the panel is made of real people, there will always be subjectivity in the ballots casted. When taking into account the approximate 450 players playing in the league each year, appointing the All-NBA Team is easier said than done. Therefore, using a model trained with the previous decades player statistics and who made past All-NBA Teams, our project sought to see if neural networks could be used to determine All-NBA Teams. 
 
