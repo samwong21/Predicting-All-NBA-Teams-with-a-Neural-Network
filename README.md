@@ -1,15 +1,15 @@
 ## Using a Keras Sequential Network to Predict All-NBA Teams
 
 
-<u>background</u>
+<ins>**Background**</ins>
 
 Being on the All-NBA Team is an annual award given to the best players in each season by the National Basketball Association. The vote consists of 100 ballots from a global panel of sportswriters and broadcasters. Since 1965, the panel has selected two guards, two forwards, and one center for each of the three teams (All-NBA Team, n.d.). Although the “success” of a player is assumed to be determined on their unbiased game time statistics, because the panel is made of real people, there will always be subjectivity in the ballots casted. When taking into account the approximate 450 players playing in the league each year, appointing the All-NBA Team is easier said than done. Therefore, using a model trained with the previous decades player statistics and who made past All-NBA Teams, our project sought to see if neural networks could be used to determine All-NBA Teams. 
 
-**Previous Studies**
+<ins>**Previous Studies**</ins>
 
 Previous studies using machine learning in conjunction with the NBA have primarily focused on predicting tournament brackets and NBA All-Stars. In an article published in Towards Data Science, researchers utilized XGBoost, an implementation of gradient boosted decision trees to classify players into whether or not they were voted to play in the NBA All-Star game. Despite their similarities in name, players are assessed by different metrics when considered for the All-Star game versus the All-NBA Team award. The most distinct of these differences is that starters for the All-Star game are determined by a mix of fan, player, and media voting, while the reserves are chosen by the coaches (Porteous, 2020).  This leads to considerations like social media presence, player popularity among fans, and team record that culminate to selections for the All-Star game straying further away from an unbiased evaluation based solely on player performance. Overall to represent each player, the data scientists decided to use a combination of specific player statistics like points per game, true shooting percentage, and player impact estimate along with external data like team conference rank, team played for, and Avg. Pace (or the average number of possessions a team gets per 48 minutes) (Porteous, 2020). 
 
-**Our Data**
+<ins>**Our Data**</ins>
 
 Our data was scraped from Basketball-Reference.com, a website that has decades worth of NBA statistics.  For the purposes of our project, we decided to use the advanced player stats CSV containing metrics that reflect a more in-depth evaluation of skill and player performance over simple box scores. We combined CSVs from the 2013/2014 season through the 2019/2020 season to serve as training data and seasons 2020/2021 and 2021/2022 for testing data. We created another CSV containing the names of players from the All-NBA teams for all aforementioned seasons. With this, we appended another column to our advanced player stats data frame with each players’ All-NBA team status encoded in binary. A 0 meant a player did not make an All-NBA team and a 1 meant they did. It is important to note that players who played multiple seasons were listed in the data frame for each year they made an appearance in the NBA. Therefore, we also made another column that contained the season year. Using our subjectivity and referencing the Towards Data Science article we determined which metrics from the advanced player stats we would use as a feature vector in our model. We decided on player efficiency rating, true shooting percentage, total rebound percentage, assist percentage, steal percentage, win shares per 48 mins, box plus/minus,  and value over replacement player. After a preliminary look at the data, we noticed that the differences between players who we knew were some of the best in the league and bench players were not always accurately represented in the percentages. Metrics like true shooting percentage, total rebound percentage, assist percentage, and steal percentage could be skewed if an unimportant player got statistics like 1 of 1 rebounds. Therefore, we decided to also pull the average points per game statistic from another CSV and append that to our data as well. All of the feature vector values were normalized before training and the All-NBA team encoding was split into its own dataset.  
 
@@ -20,9 +20,11 @@ Our data was scraped from Basketball-Reference.com, a website that has decades w
 <img width="611" alt="Screen Shot 2023-04-03 at 9 33 01 PM" src="https://user-images.githubusercontent.com/97067377/229687713-ae5a8bf1-83cd-4e15-bb2a-1367bff08895.png">
 
 
+
+
 ***Snippet of Data (“Player”, “Pos”, and “All-Nba” were dropped in feature vector)***
 
-**The Model**
+<ins>**The Model**</ins>
 
 The model was built with the Keras Application Programming Interface (API) that runs on top of TensorFlow. Tensorflow is an end-to-end open source deep learning framework that helps facilitate machine learning applications (Terra, 2023). Together, Keras provides a streamlined interface to build neural networks in TensorFlow. For this project, we used the “keras.Sequential” class to create a sequential model and add our specified layers to it. A sequential neural network has neurons organized in layers that are connected to each other in a feedforward manner. A sequential neural network was ideal for our project because it excels in classification, especially for tasks where the input and output are well-defined and there is a large quantity of training data (Keras Sequential | What Is Keras Sequential? | How to Use?, n.d.). 
 	
@@ -30,15 +32,15 @@ We built our model with four total layers, including three with the Rectified Li
 
 Because our model concludes with a sigmoid function layer, the final output will be a number between 0 and 1, which is interpreted as the probability of a player being on an All-NBA team. The higher the prediction number (closer to 1), the more likely a player is on an All-NBA team and vice versa. Therefore, the highest 15 prediction scores (5 players on each of the 3 All-NBA teams) is the model’s guess for who made an All-NBA team. 15 can be adjusted depending on the number of seasons the model is predicting. The mean prediction score for players who actually made an All-NBA team in real life was 0.84 and the mean prediction score for players who did not was 0.03. 
 
-**Changes to the Model**
+<ins>**Changes to the Model**</ins>
 
 After the first predictions were made, we noticed that many more guards were being selected, while relatively few centers were. After reflecting about what the model is actually doing, we realized that the problem may lay in which metrics the model is weighing more heavily. In real life, different statistics matter more for different positions in basketball. For example, a high total rebound percentage is much more indicative of a good center than it is of a good point guard. This lies simply in the purpose of the position. A center is meant to predominantly play in the key and get rebounds for the team, while a point guard brings the ball up the court. To account for the differences in success metrics, we decided to split our data into guards, forwards, and centers and run three different models so that each would weigh the statistics accordingly. This further reflects how the actual All-NBA teams are picked, two guards, two forwards, and one center for each team. We also noted that Lebron James was not predicted to be on an All-NBA team one of the years he actually was. On the other hand a relatively unimportant player was predicted to be on an All-NBA team. This seemed like a pretty big error, considering James is unanimously one of the best players in the NBA and has comparatively high stats. Recounting back to how the percentages in the feature vector were swayed if a player’s box scores were low, we realized that many players had high stats despite having few game appearances. To counteract this, we cut down our data to only include players that played in 40 or more games. This also reflects current NBA deliberations as the league has been considering a minimum number of games for players to appear in to receive various end of season awards (Wells, n.d.). 
 
-**Results**
+<ins>**Results**</ins>
 
 Note the test set is composed of data from the 2019/2020 and 2020/2021 season. “Ground Truth All-NBA Score” column is whether a player made an All-NBA team in real life (1  = yes, 0 = no). “pred score” column is the prediction score given to the player by the model. “predictions” column is whether or not the player is classified as an All-NBA team player by the model. “correct predictions” column is whether the “predictions” matches the “Ground Truth All-NBA Score”.
 
-**Guard Model** 
+<ins>**Guard Model**</ins>
 
 After running the guard model, the final validation loss was 0.0886 and the final validation accuracy was 0.9812 after convergence at 14 epochs. The highest 12 prediction scores were classified as making an All-NBA team. 
 
@@ -65,6 +67,7 @@ I suspect the extra guard (13 players instead of 12) was because LeBron was list
 
 
 <img width="296" alt="Screen Shot 2023-04-03 at 9 38 33 PM" src="https://user-images.githubusercontent.com/97067377/229688388-01675323-e6da-4037-ac28-92f3dd0e6c47.png">
+
 ***Image of model predictions for players who actually made the All-NBA team. Blue are correct predictions, each white line is a wrong prediction***
 
 
@@ -79,7 +82,7 @@ To investigate why some players who actually didn’t make an All-NBA team were 
   
 
 
-**Front Court Model**
+<ins>**Front Court Model**</ins>
 
 After running the front court model, the final validation loss was 0.0764 and the final validation accuracy was 0.965 after convergence at 15 epochs. The highest 12 prediction scores were classified as making an All-NBA team. 
 
@@ -143,7 +146,7 @@ To investigate why some players who actually didn’t make an All-NBA team were 
 
 
 
-**Center Model**
+<ins>**Center Model**</ins>
 
 After running the center model, the final validation loss was 0.1331 and the final validation accuracy was 0.9289 after convergence at 15 epochs. The highest 6 prediction scores were classified as making an All-NBA team. 
 
@@ -194,9 +197,9 @@ The only wrong prediction the center model made was missing Lebron James who did
 
 There were not any false positives from the center model’s predictions. 
 
-**Conclusion**
+<ins>**Conclusion**</ins>
 
-	Some limitations of our model is that it does not take into account a player’s team statistic like their win loss rate. In a real life scenario, if two players had similar stats, the player on the better team would get picked over the player on the worse team. However, this does somewhat reflect the subjectivity of the panel of judges. Team popularity and exposure does impact how judges may view players. Our model is also at the mercy of what the data lists different player positions as. As seen with Lebron James who one season was listed as a point guard, but the next as a center, when he usually is seen as a forward, the model can miss All-NBA players because it places players into a restrictive box based on their listed position. 
+Some limitations of our model is that it does not take into account a player’s team statistic like their win loss rate. In a real life scenario, if two players had similar stats, the player on the better team would get picked over the player on the worse team. However, this does somewhat reflect the subjectivity of the panel of judges. Team popularity and exposure does impact how judges may view players. Our model is also at the mercy of what the data lists different player positions as. As seen with Lebron James who one season was listed as a point guard, but the next as a center, when he usually is seen as a forward, the model can miss All-NBA players because it places players into a restrictive box based on their listed position. 
 
 Finally, according to our model’s predictions, these are the players who will make the 2023 All-NBA team.  When comparing our results from those of an Bleacher Report article, it is interesting to see that already some of our predictions are in line with what NBA fans are predicting (Favale, n.d.). However, only time will tell. 
 Guards
@@ -207,7 +210,7 @@ Front Court
 
 Centers
 
-References
+<ins>References</ins>
 
 (n.d.). Basketball-Reference.com: Basketball Statistics & History of Every Team & NBA and WNBA Players. Retrieved March 24, 2023, from https://www.basketball-reference.com/
 
