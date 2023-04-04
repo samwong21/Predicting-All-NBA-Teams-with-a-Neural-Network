@@ -1,7 +1,7 @@
 ## Using a Keras Sequential Network to Predict All-NBA Teams
 
 
-<img width="1000" alt="Screen Shot 2023-04-04 at 3 58 23 PM" src="https://user-images.githubusercontent.com/97067377/229940364-809c3242-2c79-4e4a-8144-adb54a58ecfa.png">
+<img width="1000" alt="Screen Shot 2023-04-04 at 3 59 35 PM" src="https://user-images.githubusercontent.com/97067377/229940523-06876c21-6184-4391-8951-5296dd295c32.png">
 
 
 
