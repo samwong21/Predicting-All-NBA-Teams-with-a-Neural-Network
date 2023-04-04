@@ -13,12 +13,14 @@ Previous studies using machine learning in conjunction with the NBA have primari
 
 Our data was scraped from Basketball-Reference.com, a website that has decades worth of NBA statistics.  For the purposes of our project, we decided to use the advanced player stats CSV containing metrics that reflect a more in-depth evaluation of skill and player performance over simple box scores. We combined CSVs from the 2013/2014 season through the 2019/2020 season to serve as training data and seasons 2020/2021 and 2021/2022 for testing data. We created another CSV containing the names of players from the All-NBA teams for all aforementioned seasons. With this, we appended another column to our advanced player stats data frame with each players’ All-NBA team status encoded in binary. A 0 meant a player did not make an All-NBA team and a 1 meant they did. It is important to note that players who played multiple seasons were listed in the data frame for each year they made an appearance in the NBA. Therefore, we also made another column that contained the season year. Using our subjectivity and referencing the Towards Data Science article we determined which metrics from the advanced player stats we would use as a feature vector in our model. We decided on player efficiency rating, true shooting percentage, total rebound percentage, assist percentage, steal percentage, win shares per 48 mins, box plus/minus,  and value over replacement player. After a preliminary look at the data, we noticed that the differences between players who we knew were some of the best in the league and bench players were not always accurately represented in the percentages. Metrics like true shooting percentage, total rebound percentage, assist percentage, and steal percentage could be skewed if an unimportant player got statistics like 1 of 1 rebounds. Therefore, we decided to also pull the average points per game statistic from another CSV and append that to our data as well. All of the feature vector values were normalized before training and the All-NBA team encoding was split into its own dataset.  
 
-<img width="415" alt="Screen Shot 2023-04-03 at 9 30 12 PM" src="https://user-images.githubusercontent.com/97067377/229687361-1534303e-2429-462b-801b-55a484795daa.png">
+<img width="1000" alt="Screen Shot 2023-04-03 at 9 30 12 PM" src="https://user-images.githubusercontent.com/97067377/229687361-1534303e-2429-462b-801b-55a484795daa.png" >
 
-Definitions of all metrics used in feature vector
+***Definitions of all metrics used in feature vector***
+
+<img width="611" alt="Screen Shot 2023-04-03 at 9 33 01 PM" src="https://user-images.githubusercontent.com/97067377/229687713-ae5a8bf1-83cd-4e15-bb2a-1367bff08895.png">
 
 
-Snippet of Data (“Player”, “Pos”, and “All-Nba” were dropped in feature vector)
+***Snippet of Data (“Player”, “Pos”, and “All-Nba” were dropped in feature vector)***
 
 **The Model**
 
@@ -40,51 +42,40 @@ Note the test set is composed of data from the 2019/2020 and 2020/2021 season. �
 
 After running the guard model, the final validation loss was 0.0886 and the final validation accuracy was 0.9812 after convergence at 14 epochs. The highest 12 prediction scores were classified as making an All-NBA team. 
 
-The model predicted 300 out of 306 guards correctly in the test data, meaning it had 98% accuracy. 
+<img width="695" alt="Screen Shot 2023-04-03 at 9 33 47 PM" src="https://user-images.githubusercontent.com/97067377/229687815-630f8693-cb83-44d6-be0a-fa25bff066fa.png">
 
+The model predicted **300 out of 306** guards correctly in the test data, meaning it had 98% accuracy. 
 
+<img width="329" alt="Screen Shot 2023-04-03 at 9 34 39 PM" src="https://user-images.githubusercontent.com/97067377/229687922-7d5aba43-a541-44f0-935e-096d6cc88eed.png">
 
+***Image of model predictions across all guards in test data. Blue are correct predictions, each white line is a wrong prediction***
 
-Image of model predictions across all guards in test data. Blue are correct predictions, each white line is a wrong prediction
+<img width="580" alt="Screen Shot 2023-04-03 at 9 35 07 PM" src="https://user-images.githubusercontent.com/97067377/229687978-666b381f-32d1-4577-a998-26a5035c121b.png">
 
-
-
-Players the guard model predicted incorrectly
-
-
-
-
-
-
-
+***Players the guard model predicted incorrectly***
 
 It seemed unusual that 2020/2021 LeBron James had such a low prediction score considering that he is always one of the best players in the NBA. Upon closer inspection, LeBron was put as a point guard in the 2020/2021 season data, when he is usually a forward. This supports our belief that the model weighs statistics differently depending on position and that real All-NBA team voting is at the mercy of judge subjectivity. According to our model, James is not the best guard, but we all know he is one of the best players in the league.
 
-Lebron James’ data for the 2020/2021 Season (note he is listed as PG)
+<img width="688" alt="Screen Shot 2023-04-03 at 9 36 18 PM" src="https://user-images.githubusercontent.com/97067377/229688134-5e82a779-b7b6-4bb9-a02c-2be69689a019.png">
 
-The guard model predicted 11 out of 13 actual All-NBA team players, meaning it had an 85% accuracy. 
+***Lebron James’ data for the 2020/2021 Season (note he is listed as PG)***
+
+The guard model predicted **11 out of 13** actual All-NBA team players, meaning it had an 85% accuracy. 
 I suspect the extra guard (13 players instead of 12) was because LeBron was listed as a point guard.
 
 
-Image of model predictions for players who actually made the All-NBA team. Blue are correct predictions, each white line is a wrong prediction
+<img width="296" alt="Screen Shot 2023-04-03 at 9 38 33 PM" src="https://user-images.githubusercontent.com/97067377/229688388-01675323-e6da-4037-ac28-92f3dd0e6c47.png">
+***Image of model predictions for players who actually made the All-NBA team. Blue are correct predictions, each white line is a wrong prediction***
 
 
+<img width="429" alt="Screen Shot 2023-04-03 at 9 38 54 PM" src="https://user-images.githubusercontent.com/97067377/229688426-954f60cc-f3c2-4e57-a532-40b028f3b7b1.png">
 
-
-
-
-
-
-Players that made an All-NBA team in real life
-
-
-
-
-
-
-
+***Players that made an All-NBA team in real life***
 
 To investigate why some players who actually didn’t make an All-NBA team were chosen over players who did actually make an All-NBA team, I looked into the differences between average statistics between our model’s false positives and false negatives. From the images below we can see that the false positives (players who the model predicted to be All-NBA players but weren’t) played, on average, more games, and had a higher average assist percentage than the false negatives (real life All-NBA players the model missed). From this, the inference that games played and assist percentage were weighed more heavily in the guard model.
+
+<img width="756" alt="Screen Shot 2023-04-03 at 9 39 22 PM" src="https://user-images.githubusercontent.com/97067377/229688471-88bb46d3-c4ef-40c5-9edc-e105f82b268f.png">
+
   
 
 
